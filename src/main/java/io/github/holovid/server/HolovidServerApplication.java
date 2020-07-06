@@ -11,8 +11,7 @@ public class HolovidServerApplication {
     private static final Logger LOGGER = LoggerFactory.getLogger("HolovidServer");
 
     public HolovidServerApplication() {
-        LOGGER.info("Hello... and goodbye!");
-        System.exit(0);
+        LOGGER.info("Hello!");
     }
 
     public static void main(final String[] args) {
