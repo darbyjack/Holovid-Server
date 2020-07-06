@@ -1,0 +1,59 @@
+plugins {
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '5.1.0'
+}
+
+allprojects {
+    apply plugin: 'java'
+
+    group = 'io.github.holovid'
+    version = '1.0'
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+        compileOnly "org.jetbrains:annotations:19.0.0"
+
+        implementation "org.springframework.boot:spring-boot-starter-web:2.3.1.RELEASE"
+        implementation "org.slf4j:slf4j-api:1.7.30"
+
+        implementation "ws.schild:jave-all-deps:2.7.3"
+        // TODO: replace with the 2 below, only need them once on the proper server
+        //implementation "ws.schild:jave-core:2.7.3"
+        //implementation "ws.schild:jave-nativebin-linux64:2.7.3"
+    }
+
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    compileJava {
+        options.compilerArgs += ["-parameters"]
+        options.fork = true
+        options.forkOptions.executable = 'javac'
+        options.encoding = 'UTF-8'
+    }
+
+}
+
+shadowJar {
+    archiveFileName = "HolovidServer-${project.version}.jar"
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+application {
+    mainClassName = 'io.github.holovid.server.HolovidServerApplication'
+}
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter ReplaceTokens, tokens: [version: version]
+    }
+}
