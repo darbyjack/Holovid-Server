@@ -23,9 +23,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -36,7 +37,7 @@ public final class ResourcePackController {
     private static final long LARGE_THRESHOLD = TimeUnit.MINUTES.toMillis(30);
     private final Encoder audioEncoder = new Encoder();
     private final HolovidServerApplication server;
-    private final Set<String> processing = new HashSet<>();
+    private final Map<String, ReentrantLock> processing = new HashMap<>();
 
     public ResourcePackController(final HolovidServerApplication server) {
         this.server = server;
@@ -50,27 +51,6 @@ public final class ResourcePackController {
      */
     @GetMapping("resourcepack/download")
     public ResponseEntity<String> downloadResourcePack(@RequestParam("videoUrl") final String videoUrl) throws Exception {
-        try {
-            synchronized (processing) {
-                if (!processing.add(videoUrl.toLowerCase())) {
-                    //TODO wait until process thread is finished and return same url
-                    // (manual sleeping/reentrantlock)
-                }
-            }
-
-            try {
-                return createResourcepack(videoUrl);
-            } catch (final VideoTooLongException e) {
-                return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).build();
-            }
-        } finally {
-            synchronized (processing) {
-                processing.remove(videoUrl.toLowerCase());
-            }
-        }
-    }
-
-    private ResponseEntity<String> createResourcepack(final String videoUrl) throws Exception {
         final URL url;
         try {
             url = new URL(videoUrl);
@@ -82,6 +62,42 @@ public final class ResourcePackController {
         if (downloader == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
         final String id = downloader.getIdFromVideo(url);
+        boolean alreadyProcessing = false;
+        try {
+            final ReentrantLock oldLock;
+            synchronized (processing) {
+                oldLock = processing.get(id);
+                if (oldLock == null) {
+                    final ReentrantLock newLock = new ReentrantLock();
+                    newLock.lock();
+                    processing.put(id, newLock);
+                } else {
+                    alreadyProcessing = true;
+                }
+            }
+
+            if (alreadyProcessing) {
+                // Just wait for it to finish and use the cached result
+                oldLock.lock();
+                oldLock.unlock();
+            }
+
+            try {
+                return createResourcepack(downloader, url, id);
+            } catch (final VideoTooLongException e) {
+                return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).build();
+            }
+        } finally {
+            if (!alreadyProcessing) {
+                synchronized (processing) {
+                    final ReentrantLock removed = processing.remove(id);
+                    removed.unlock();
+                }
+            }
+        }
+    }
+
+    private ResponseEntity<String> createResourcepack(final VideoDownloader downloader, final URL url, final String id) throws Exception {
         final File zipFile = new File(downloader.getDirectory(), id + ".zip");
         final String externalDownloadPath = zipFile.getAbsolutePath(); //TODO url for the download
         if (zipFile.exists()) {
