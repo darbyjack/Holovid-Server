@@ -13,6 +13,7 @@ allprojects {
 
     repositories {
         mavenCentral()
+        maven { url = 'https://jitpack.io' }
     }
 
     dependencies {
@@ -22,10 +23,13 @@ allprojects {
         implementation "org.springframework.shell:spring-shell-starter:2.0.1.RELEASE"
         implementation "org.slf4j:slf4j-api"
 
-        implementation "ws.schild:jave-all-deps:2.7.3"
-        // TODO: replace with the 2 below, only need them once on the proper server
-        //implementation "ws.schild:jave-core:2.7.3"
+        implementation "ws.schild:jave-core:2.7.3"
+        // TODO: replace win64 with linux64 (temporarily add any of other other if you need to test the project on them)
+        implementation "ws.schild:jave-nativebin-win64:2.7.3"
         //implementation "ws.schild:jave-nativebin-linux64:2.7.3"
+        //implementation "ws.schild:jave-nativebin-osx64:2.7.3"
+
+        implementation "com.github.sealedtx:java-youtube-downloader:2.2.0"
     }
 
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -50,12 +54,4 @@ tasks.withType(JavaCompile) {
 
 application {
     mainClassName = 'io.github.holovid.server.HolovidServerApplication'
-}
-
-import org.apache.tools.ant.filters.ReplaceTokens
-
-processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        filter ReplaceTokens, tokens: [version: version]
-    }
 }
