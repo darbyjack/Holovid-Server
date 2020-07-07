@@ -86,6 +86,9 @@ public final class ResourcePackController {
                 return createResourcepack(downloader, url, id);
             } catch (final VideoTooLongException e) {
                 return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).build();
+            } catch (final Exception e) {
+                LOGGER.error("Error processing video: {} (id {})", videoUrl, id);
+                throw e;
             }
         } finally {
             if (!alreadyProcessing) {

@@ -70,8 +70,13 @@ public class HolovidServerApplication {
 
     @Nullable
     public VideoDownloader getVideoDownloaderForUrl(final URL videoUrl) {
-        //TODO support multiple platforms
-        return videoDownloader;
+        //TODO support multiple platforms, proper pattern matching (and potentially another lib)
+        final String authority = videoUrl.getAuthority().toLowerCase();
+        final String[] split = authority.split("\\.");
+        if (split.length < 2) return null;
+
+        final String mainPart = split[split.length - 2];
+        return mainPart.equals("youtube") ||  (mainPart.equals("youtu") && split[split.length -1].equals("be")) ? videoDownloader : null;
     }
 
     public File getGetDataBaseDir() {
