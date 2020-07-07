@@ -33,6 +33,7 @@ import java.util.zip.ZipOutputStream;
 @RestController
 public final class ResourcePackController {
 
+    private static final String DOMAIN = "https://holov.id/data/downloads/%s/%s"; // Keep the full url server-side, so that we may change it at any time
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourcePackController.class);
     private static final long LARGE_THRESHOLD = TimeUnit.MINUTES.toMillis(30);
     private final Encoder audioEncoder = new Encoder();
@@ -106,9 +107,9 @@ public final class ResourcePackController {
 
     private ResponseEntity<String> createResourcepack(final VideoDownloader downloader, final URL url, final String id) throws Exception {
         final File zipFile = new File(downloader.getDirectory(), id + ".zip");
-        final String externalDownloadPath = zipFile.getAbsolutePath(); //TODO url for the download
+        final String downloadUrl = String.format(DOMAIN, downloader.getDirectory().getName(), zipFile.getName());
         if (zipFile.exists()) {
-            return ResponseEntity.ok(externalDownloadPath);
+            return ResponseEntity.ok(downloadUrl);
         }
 
         // Download video
@@ -133,7 +134,7 @@ public final class ResourcePackController {
         }
 
         audioFile.delete();
-        return ResponseEntity.ok(externalDownloadPath);
+        return ResponseEntity.ok(downloadUrl);
     }
 
     private void addToZipFile(final String pathInZip, final File file, final ZipOutputStream out) throws IOException {
