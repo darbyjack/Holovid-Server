@@ -76,7 +76,7 @@ public class HolovidServerApplication {
         if (split.length < 2) return null;
 
         final String mainPart = split[split.length - 2];
-        return mainPart.equals("youtube") ||  (mainPart.equals("youtu") && split[split.length -1].equals("be")) ? videoDownloader : null;
+        return mainPart.equals("youtube") || (mainPart.equals("youtu") && split[split.length - 1].equals("be")) ? videoDownloader : null;
     }
 
     public File getGetDataBaseDir() {

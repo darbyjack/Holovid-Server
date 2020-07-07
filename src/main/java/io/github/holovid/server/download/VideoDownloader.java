@@ -2,6 +2,7 @@ package io.github.holovid.server.download;
 
 import io.github.holovid.server.HolovidServerApplication;
 import io.github.holovid.server.exception.VideoTooLongException;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.net.URL;
@@ -30,6 +31,7 @@ public abstract class VideoDownloader {
      * @param videoUrl video url
      * @return unique string of the video for this video platform
      */
+    @Nullable
     public abstract String getIdFromVideo(URL videoUrl);
 
     /**

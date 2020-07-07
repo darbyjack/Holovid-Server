@@ -62,6 +62,10 @@ public final class ResourcePackController {
         if (downloader == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
         final String id = downloader.getIdFromVideo(url);
+        if (id == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
         boolean alreadyProcessing = false;
         try {
             final ReentrantLock oldLock;

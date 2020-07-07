@@ -6,6 +6,7 @@ import com.github.kiulian.downloader.model.YoutubeVideo;
 import com.github.kiulian.downloader.model.formats.AudioVideoFormat;
 import io.github.holovid.server.HolovidServerApplication;
 import io.github.holovid.server.exception.VideoTooLongException;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +38,9 @@ public final class YouTubeDownloader extends VideoDownloader {
     }
 
     @Override
+    @Nullable
     public String getIdFromVideo(final URL videoUrl) {
-        return videoUrl.getQuery().substring(2);
+        final String query = videoUrl.getQuery();
+        return query != null && query.length() > 2 ? query.substring(2) : query;
     }
 }
