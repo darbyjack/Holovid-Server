@@ -11,9 +11,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.annotation.PreDestroy;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
-import java.nio.file.Files;
 
 @SpringBootApplication
 public class HolovidServerApplication {
@@ -42,15 +44,8 @@ public class HolovidServerApplication {
 
         // Write template files
         try {
-            final File mcMetaFile = new File(templateDir, "pack.mcmeta");
-            if (!mcMetaFile.exists()) {
-                Files.write(mcMetaFile.toPath(), "{\"pack\":{\"pack_format\":5,\"description\":\"Holovid\"}}".getBytes());
-            }
-
-            final File soundFile = new File(templateDir, "sounds.json");
-            if (!soundFile.exists()) {
-                Files.write(soundFile.toPath(), "{\"holovid.video\":{\"sounds\": [\"holovid/audio\"]}}".getBytes());
-            }
+            copyResource("pack.mcmeta", new File(templateDir, "pack.mcmeta"));
+            copyResource("sounds.json", new File(templateDir, "sounds.json"));
         } catch (final IOException e) {
             LOGGER.error("Error writing resource pack files into the template folder", e);
             System.exit(1);
@@ -77,6 +72,17 @@ public class HolovidServerApplication {
 
         final String mainPart = split[split.length - 2];
         return mainPart.equals("youtube") || (mainPart.equals("youtu") && split[split.length - 1].equals("be")) ? videoDownloader : null;
+    }
+
+    public void copyResource(final String resourceName, final File to) throws IOException {
+        if (to.exists()) return;
+        try (final InputStream in = HolovidServerApplication.class.getResourceAsStream(resourceName); final OutputStream out = new FileOutputStream(to)) {
+            final byte[] buf = new byte[1024];
+            int length;
+            while ((length = in.read(buf)) > 0) {
+                out.write(buf, 0, length);
+            }
+        }
     }
 
     public File getGetDataBaseDir() {
