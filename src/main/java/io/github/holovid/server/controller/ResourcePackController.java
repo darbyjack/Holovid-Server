@@ -40,10 +40,10 @@ public final class ResourcePackController {
     private final HolovidServerApplication server;
     private final Map<String, ReentrantLock> processing = new HashMap<>();
 
-    final File mcMetaFile;
-    final File soundsFile;
-    final File fontDefault;
-    final File defaultPixel;
+    private final File mcMetaFile;
+    private final File soundsFile;
+    private final File fontDefault;
+    private final File defaultPixel;
 
     public ResourcePackController(final HolovidServerApplication server) {
         this.server = server;
@@ -134,7 +134,6 @@ public final class ResourcePackController {
         }
 
         // Zip it
-
         try (final ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFile))) {
             addToZipFile("", mcMetaFile, out);
             addToZipFile("assets/minecraft/", soundsFile, out);

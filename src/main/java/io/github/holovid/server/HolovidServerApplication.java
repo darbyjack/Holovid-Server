@@ -17,9 +17,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLConnection;
 
 @SpringBootApplication
-public class HolovidServerApplication extends SpringBootServletInitializer{
+public class HolovidServerApplication extends SpringBootServletInitializer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HolovidServerApplication.class);
     private final File getDataBaseDir = new File("data");
@@ -79,13 +80,27 @@ public class HolovidServerApplication extends SpringBootServletInitializer{
 
     public void copyResource(final String resourceName, final File to) throws IOException {
         if (to.exists()) return;
-        try (final InputStream in = HolovidServerApplication.class.getResourceAsStream(resourceName); final OutputStream out = new FileOutputStream(to)) {
+        try (final InputStream in = getResource(resourceName); final OutputStream out = new FileOutputStream(to)) {
+            if (in == null) {
+                throw new IllegalArgumentException("Resource " + resourceName + " does not exist!");
+            }
+
             final byte[] buf = new byte[1024];
             int length;
             while ((length = in.read(buf)) > 0) {
                 out.write(buf, 0, length);
             }
         }
+    }
+
+    @Nullable
+    private InputStream getResource(final String resourceName) throws IOException {
+        final URL url = HolovidServerApplication.class.getClassLoader().getResource(resourceName);
+        if (url == null) return null;
+
+        final URLConnection connection = url.openConnection();
+        connection.setUseCaches(false);
+        return connection.getInputStream();
     }
 
     public File getGetDataBaseDir() {
