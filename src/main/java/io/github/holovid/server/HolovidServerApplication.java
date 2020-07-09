@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 import javax.annotation.PreDestroy;
 import java.io.File;
@@ -18,7 +19,7 @@ import java.io.OutputStream;
 import java.net.URL;
 
 @SpringBootApplication
-public class HolovidServerApplication {
+public class HolovidServerApplication extends SpringBootServletInitializer{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HolovidServerApplication.class);
     private final File getDataBaseDir = new File("data");
@@ -46,6 +47,8 @@ public class HolovidServerApplication {
         try {
             copyResource("pack.mcmeta", new File(templateDir, "pack.mcmeta"));
             copyResource("sounds.json", new File(templateDir, "sounds.json"));
+            copyResource("default.json", new File(templateDir, "default.json"));
+            copyResource("pixel.png", new File(templateDir, "pixel.png"));
         } catch (final IOException e) {
             LOGGER.error("Error writing resource pack files into the template folder", e);
             System.exit(1);
