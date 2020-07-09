@@ -1,9 +1,11 @@
 package io.github.holovid.server.controller;
 
+import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 import io.github.holovid.server.HolovidServerApplication;
 import io.github.holovid.server.download.DownloadResult;
 import io.github.holovid.server.download.VideoDownloader;
 import io.github.holovid.server.exception.VideoTooLongException;
+import io.github.holovid.server.model.ResourcePackResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -23,7 +25,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -58,10 +64,10 @@ public final class ResourcePackController {
      * Downloads the video from the given url and encodes its audio into a resource pack.
      *
      * @param videoUrl video url
-     * @return download link for a resourcepack with the video's sound if successfull
+     * @return result containing a download link for a resourcepack with the video's sound and its sha-1 hash if successfull
      */
     @GetMapping("resourcepack/download")
-    public ResponseEntity<String> downloadResourcePack(@RequestParam("videoUrl") final String videoUrl) throws Exception {
+    public ResponseEntity<ResourcePackResult> downloadResourcePack(@RequestParam("videoUrl") final String videoUrl) throws Exception {
         final URL url;
         try {
             url = new URL(videoUrl);
@@ -115,11 +121,11 @@ public final class ResourcePackController {
         }
     }
 
-    private ResponseEntity<String> createResourcepack(final VideoDownloader downloader, final URL url, final String id) throws Exception {
+    private ResponseEntity<ResourcePackResult> createResourcepack(final VideoDownloader downloader, final URL url, final String id) throws Exception {
         final File zipFile = new File(downloader.getDirectory(), id + ".zip");
         final String downloadUrl = String.format(DOMAIN, downloader.getDirectory().getName(), zipFile.getName());
         if (zipFile.exists()) {
-            return ResponseEntity.ok(downloadUrl);
+            return ResponseEntity.ok(new ResourcePackResult(downloadUrl, sha1FromFile(zipFile)));
         }
 
         // Download video
@@ -144,7 +150,17 @@ public final class ResourcePackController {
         }
 
         audioFile.delete();
-        return ResponseEntity.ok(downloadUrl);
+        return ResponseEntity.ok(new ResourcePackResult(downloadUrl, sha1FromFile(zipFile)));
+    }
+
+    private String sha1FromFile(final File file) throws IOException, NoSuchAlgorithmException {
+        final MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+        try (final DigestInputStream in = new DigestInputStream(new FileInputStream(file), sha1)) {
+            final byte[] buf = new byte[1024];
+            //noinspection StatementWithEmptyBody
+            while (in.read(buf) > 0) ;
+            return HexBin.encode(sha1.digest()).toLowerCase(Locale.ROOT);
+        }
     }
 
     private void addToZipFile(final String pathInZip, final File file, final ZipOutputStream out) throws IOException {
