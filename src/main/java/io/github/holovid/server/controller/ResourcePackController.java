@@ -40,8 +40,18 @@ public final class ResourcePackController {
     private final HolovidServerApplication server;
     private final Map<String, ReentrantLock> processing = new HashMap<>();
 
+    final File mcMetaFile;
+    final File soundsFile;
+    final File fontDefault;
+    final File defaultPixel;
+
     public ResourcePackController(final HolovidServerApplication server) {
         this.server = server;
+
+        this.mcMetaFile = new File(server.getTemplateDir(), "pack.mcmeta");
+        this.soundsFile = new File(server.getTemplateDir(), "sounds.json");
+        this.fontDefault = new File(server.getTemplateDir(), "default.json");
+        this.defaultPixel = new File(server.getTemplateDir(), "pixel.png");
     }
 
     /**
@@ -124,12 +134,13 @@ public final class ResourcePackController {
         }
 
         // Zip it
-        final File mcMetaFile = new File(server.getTemplateDir(), "pack.mcmeta");
-        final File soundsFile = new File(server.getTemplateDir(), "sounds.json");
+
         try (final ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFile))) {
             addToZipFile("", mcMetaFile, out);
             addToZipFile("assets/minecraft/", soundsFile, out);
             addToZipFile("assets/minecraft/sounds/holovid/", audioFile, out);
+            addToZipFile("assets/minecraft/font/", fontDefault, out);
+            addToZipFile("assets/minecraft/textures/font/", defaultPixel, out);
             out.flush();
         }
 
