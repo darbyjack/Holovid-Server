@@ -1,5 +1,8 @@
 package io.github.holovid.server;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import io.github.holovid.server.controller.ResourcePackController;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +20,7 @@ import org.springframework.web.context.WebApplicationContext;
 @WebMvcTest(ResourcePackController.class)
 public class ResourcePackTests {
 
+    private static final Gson GSON = new Gson();
     @Autowired
     private WebApplicationContext webApplicationContext;
     private MockMvc mvc;
@@ -31,7 +35,16 @@ public class ResourcePackTests {
         mvc.perform(MockMvcRequestBuilders.get("/resourcepack/download").param("videoUrl", "https://youtube.com/watch?v=dt22yWYX64w"))
                 .andExpect(result -> {
                     assert result.getResponse().getStatus() == HttpStatus.OK.value();
-                    assert result.getResponse().getContentAsString().endsWith("dt22yWYX64w.zip");
+
+                    final String content = result.getResponse().getContentAsString();
+                    assert !content.isEmpty();
+
+                    final JsonObject object = GSON.fromJson(content, JsonObject.class);
+                    final JsonPrimitive hash = object.getAsJsonPrimitive("hash");
+                    assert hash != null && hash.getAsString().length() == 40;
+
+                    final JsonPrimitive url = object.getAsJsonPrimitive("url");
+                    assert url != null && url.getAsString().equals("https://holov.id/data/downloads/yt/dt22yWYX64w.zip");
                 });
     }
 
