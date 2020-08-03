@@ -1,5 +1,7 @@
 package io.github.holovid.server;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import io.github.holovid.server.download.VideoDownloader;
 import io.github.holovid.server.download.YouTubeDownloader;
 import io.github.holovid.server.util.FileUtil;
@@ -18,15 +20,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
 
 @SpringBootApplication
 public class HolovidServerApplication extends SpringBootServletInitializer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HolovidServerApplication.class);
-    private final File getDataBaseDir = new File("data");
-    private final File templateDir = new File(getDataBaseDir, "template");
-    private final File downloadsDir = new File(getDataBaseDir, "downloads");
+    private File dataBaseDir;
+    private File templateDir;
+    private File downloadsDir;
     private final VideoDownloader videoDownloader;
+    private String serverUrl;
 
     public HolovidServerApplication() {
         LOGGER.info("\n" +
@@ -37,15 +41,10 @@ public class HolovidServerApplication extends SpringBootServletInitializer {
                 " |_| |_|_____|_____|_____\\___/ \\___/ \n" +
                 " It'sa me, KennyTV\n");
 
-        // Cleanup old downloaded files
-        FileUtil.deleteDirectory(downloadsDir);
-
-        // Create base directories and templates
-        templateDir.mkdirs();
-        downloadsDir.mkdirs();
-
-        // Write template files
+        // Read config, write template files
         try {
+            loadConfig();
+
             copyResource("pack.mcmeta", new File(templateDir, "pack.mcmeta"));
             copyResource("sounds.json", new File(templateDir, "sounds.json"));
             copyResource("default.json", new File(templateDir, "default.json"));
@@ -56,6 +55,27 @@ public class HolovidServerApplication extends SpringBootServletInitializer {
         }
 
         videoDownloader = new YouTubeDownloader(this);
+    }
+
+    private void loadConfig() throws IOException {
+        final File dataDir = new File("data");
+        dataDir.mkdirs();
+        final File configFile = new File(dataDir, "config.json");
+        copyResource("config.json", configFile);
+
+        final JsonObject object = new Gson().fromJson(Files.readString(configFile.toPath()), JsonObject.class);
+        serverUrl = object.getAsJsonPrimitive("server-url").getAsString();
+        if (serverUrl.endsWith("/")) {
+            serverUrl += "/";
+        }
+
+        dataBaseDir = new File(object.getAsJsonPrimitive("resourcepack-path").getAsString());
+        templateDir = new File(dataBaseDir, "template");
+        downloadsDir = new File(dataBaseDir, "downloads");
+
+        // Create base directories and templates
+        templateDir.mkdirs();
+        downloadsDir.mkdirs();
     }
 
     public static void main(final String[] args) {
@@ -103,15 +123,19 @@ public class HolovidServerApplication extends SpringBootServletInitializer {
         return connection.getInputStream();
     }
 
-    public File getGetDataBaseDir() {
-        return getDataBaseDir;
-    }
-
     public File getTemplateDir() {
         return templateDir;
     }
 
     public File getDownloadsDir() {
         return downloadsDir;
+    }
+
+    public String getServerUrl() {
+        return serverUrl;
+    }
+
+    public File getDataDir() {
+        return dataBaseDir;
     }
 }

@@ -1,11 +1,11 @@
 package io.github.holovid.server.controller;
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 import io.github.holovid.server.HolovidServerApplication;
 import io.github.holovid.server.download.DownloadResult;
 import io.github.holovid.server.download.VideoDownloader;
 import io.github.holovid.server.exception.VideoTooLongException;
 import io.github.holovid.server.model.ResourcePackResult;
+import io.github.holovid.server.util.HexUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -39,12 +39,12 @@ import java.util.zip.ZipOutputStream;
 @RestController
 public final class ResourcePackController {
 
-    private static final String DOMAIN = "https://holov.id/data/downloads/%s/%s"; // Keep the full url server-side, so that we may change it at any time
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourcePackController.class);
     private static final long LARGE_THRESHOLD = TimeUnit.MINUTES.toMillis(30);
     private final Encoder audioEncoder = new Encoder();
-    private final HolovidServerApplication server;
     private final Map<String, ReentrantLock> processing = new HashMap<>();
+    private final HolovidServerApplication server;
+    private final String downloadUrl;
 
     private final File mcMetaFile;
     private final File soundsFile;
@@ -53,6 +53,7 @@ public final class ResourcePackController {
 
     public ResourcePackController(final HolovidServerApplication server) {
         this.server = server;
+        this.downloadUrl = server.getServerUrl() + "downloads/%s/%s"; // Keep the full url server-side, so that we may change it at any time;
 
         this.mcMetaFile = new File(server.getTemplateDir(), "pack.mcmeta");
         this.soundsFile = new File(server.getTemplateDir(), "sounds.json");
@@ -123,7 +124,7 @@ public final class ResourcePackController {
 
     private ResponseEntity<ResourcePackResult> createResourcepack(final VideoDownloader downloader, final URL url, final String id) throws Exception {
         final File zipFile = new File(downloader.getDirectory(), id + ".zip");
-        final String downloadUrl = String.format(DOMAIN, downloader.getDirectory().getName(), zipFile.getName());
+        final String downloadUrl = String.format(this.downloadUrl, downloader.getDirectory().getName(), zipFile.getName());
         if (zipFile.exists()) {
             return ResponseEntity.ok(new ResourcePackResult(downloadUrl, sha1FromFile(zipFile)));
         }
@@ -159,7 +160,7 @@ public final class ResourcePackController {
             final byte[] buf = new byte[1024];
             //noinspection StatementWithEmptyBody
             while (in.read(buf) > 0) ;
-            return HexBin.encode(sha1.digest()).toLowerCase(Locale.ROOT);
+            return HexUtil.encode(sha1.digest()).toLowerCase(Locale.ROOT);
         }
     }
 

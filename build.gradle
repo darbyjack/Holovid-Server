@@ -35,8 +35,9 @@ allprojects {
         implementation "com.github.sealedtx:java-youtube-downloader:2.2.0"
     }
 
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    // btw: File -> Settings -> Build, Execution, Deployment -> Build Tools -> Gradle
+    sourceCompatibility = JavaVersion.VERSION_14
+    targetCompatibility = JavaVersion.VERSION_14
 
     compileJava {
         options.compilerArgs += ["-parameters"]

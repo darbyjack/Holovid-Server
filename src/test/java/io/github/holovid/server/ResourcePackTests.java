@@ -23,6 +23,8 @@ public class ResourcePackTests {
     private static final Gson GSON = new Gson();
     @Autowired
     private WebApplicationContext webApplicationContext;
+    @Autowired
+    private HolovidServerApplication application;
     private MockMvc mvc;
 
     @Before
@@ -44,7 +46,7 @@ public class ResourcePackTests {
                     assert hash != null && hash.getAsString().length() == 40;
 
                     final JsonPrimitive url = object.getAsJsonPrimitive("url");
-                    assert url != null && url.getAsString().equals("https://holov.id/data/downloads/yt/dt22yWYX64w.zip");
+                    assert url != null && url.getAsString().equals(application.getServerUrl() + "downloads/yt/dt22yWYX64w.zip");
                 });
     }
 
