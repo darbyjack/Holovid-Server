@@ -68,7 +68,7 @@ public final class ResourcePackController {
      * @return result containing a download link for a resourcepack with the video's sound and its sha-1 hash if successfull
      */
     @GetMapping("resourcepack/download")
-    public ResponseEntity<ResourcePackResult> downloadResourcePack(@RequestParam("videoUrl") final String videoUrl) throws Exception {
+    public ResponseEntity<ResourcePackResult> downloadResourcePack(@RequestParam(value = "videoUrl") final String videoUrl) throws Exception {
         final URL url;
         try {
             url = new URL(videoUrl);

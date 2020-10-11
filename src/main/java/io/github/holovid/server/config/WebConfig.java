@@ -13,6 +13,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(@NotNull final ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/data/**")
-                .addResourceLocations("/data/");
+                .addResourceLocations("/data/", "file:data/");
     }
 }

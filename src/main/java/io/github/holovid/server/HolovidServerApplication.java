@@ -64,8 +64,10 @@ public class HolovidServerApplication extends SpringBootServletInitializer {
         copyResource("config.json", configFile);
 
         final JsonObject object = new Gson().fromJson(Files.readString(configFile.toPath()), JsonObject.class);
+
+        //serverUrl = "http://localhost:8997/data/";
         serverUrl = object.getAsJsonPrimitive("server-url").getAsString();
-        if (serverUrl.endsWith("/")) {
+        if (!serverUrl.endsWith("/")) {
             serverUrl += "/";
         }
 

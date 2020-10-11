@@ -36,8 +36,8 @@ allprojects {
     }
 
     // btw: File -> Settings -> Build, Execution, Deployment -> Build Tools -> Gradle
-    sourceCompatibility = JavaVersion.VERSION_14
-    targetCompatibility = JavaVersion.VERSION_14
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 
     compileJava {
         options.compilerArgs += ["-parameters"]
