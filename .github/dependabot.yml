@@ -1,0 +1,22 @@
+version: 2
+updates:
+- package-ecosystem: gradle
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: org.springframework.boot
+    versions:
+    - 2.4.2
+    - 2.4.3
+    - 2.4.4
+  - dependency-name: com.github.johnrengelman.shadow
+    versions:
+    - 6.1.0
+  - dependency-name: ws.schild:jave-nativebin-win64
+    versions:
+    - 3.0.1
+  - dependency-name: ws.schild:jave-core
+    versions:
+    - 3.0.1
