@@ -24,7 +24,7 @@ allprojects {
         implementation "org.springframework.boot:spring-boot-starter-web"
         implementation "org.springframework.shell:spring-shell-starter:2.0.1.RELEASE"
         implementation "org.slf4j:slf4j-api"
-        implementation "com.google.code.gson:gson:2.8.6"
+        implementation "com.google.code.gson:gson:2.8.7"
 
         implementation "ws.schild:jave-core:2.7.3"
         // TODO: replace win64 with linux64 (temporarily add any of other other if you need to test the project on them)
