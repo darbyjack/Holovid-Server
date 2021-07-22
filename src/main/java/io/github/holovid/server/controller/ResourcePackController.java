@@ -13,11 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ws.schild.jave.AudioAttributes;
 import ws.schild.jave.Encoder;
 import ws.schild.jave.EncoderException;
-import ws.schild.jave.EncodingAttributes;
 import ws.schild.jave.MultimediaObject;
+import ws.schild.jave.encode.AudioAttributes;
+import ws.schild.jave.encode.EncodingAttributes;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -189,7 +189,8 @@ public final class ResourcePackController {
         audio.setSamplingRate(44_100);
 
         final EncodingAttributes encoding = new EncodingAttributes();
-        encoding.setFormat("ogg");
+        encoding.setOutputFormat("ogg");
+       // encoding.setFormat("ogg");
         encoding.setAudioAttributes(audio);
 
         final File target = new File(videoFile.getParentFile(), "audio.ogg");
