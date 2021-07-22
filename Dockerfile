@@ -1,13 +1,14 @@
 # Prepare environment
-FROM alpine:3.13
-RUN apk add openjdk16 && apk add ffmpeg && apk add git
+FROM arm64v8/alpine:3.14.0
+RUN apk update && apk add openjdk11 && apk add git && apk add ffmpeg
 
 # Download source code
 RUN git clone https://github.com/darbyjack/Holovid-Server.git /app
 WORKDIR /app
 
 # Build the source into a binary
-RUN ./gradlew clean build
+RUN chmod +x ./gradlew
+RUN ./gradlew clean build -x test
 
 # Package the application
-CMD /bin/sh -c "java -Xms64M -Xmx64M -jar build/libs/HolovidServer-1.0-SNAPSHOT.jar"
+CMD /bin/sh -c "java -Xms2G -Xmx2G -jar build/libs/HolovidServer-1.0-SNAPSHOT.jar"
