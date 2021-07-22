@@ -1,10 +1,9 @@
 plugins {
-    id 'application'
+    id 'java'
     id 'org.springframework.boot' version '2.5.2'
 }
 
 allprojects {
-    apply plugin: 'java'
     apply plugin: 'io.spring.dependency-management'
 
     group = 'io.github.holovid'
@@ -15,7 +14,7 @@ allprojects {
         maven { url = 'https://jitpack.io' }
     }
 
-    bootJar {
+    jar {
         archiveFileName = "HolovidServer-${project.version}.jar"
     }
 
@@ -56,10 +55,6 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-tasks.test {
+test {
     useJUnit()
-}
-
-application {
-    mainClassName = 'io.github.holovid.server.HolovidServerApplication'
 }
