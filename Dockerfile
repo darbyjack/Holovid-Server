@@ -1,6 +1,6 @@
 # Prepare environment
 FROM alpine:3.13
-RUN apk add openjdk16
+RUN apk add openjdk16 && apk add ffmpeg && apk add git
 
 # Download source code
 RUN git clone https://github.com/darbyjack/Holovid-Server.git /app
