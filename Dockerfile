@@ -1,6 +1,6 @@
 # Prepare environment
 FROM arm64v8/alpine:3.14.0
-RUN apk update && apk add openjdk11 && apk add git && apk add ffmpeg
+RUN apk add --no-cache openjdk11 git
 
 # Download source code
 RUN git clone https://github.com/darbyjack/Holovid-Server.git /app

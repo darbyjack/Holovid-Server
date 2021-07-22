@@ -37,7 +37,8 @@ allprojects {
         implementation "ws.schild:jave-core:3.1.1"
         // TODO: replace win64 with linux64 (temporarily add any of other other if you need to test the project on them)
         // implementation "ws.schild:jave-nativebin-win64:3.1.1"
-        implementation "ws.schild:jave-nativebin-linux64:3.1.1"
+        // implementation "ws.schild:jave-nativebin-linux64:3.1.1"
+        implementation "ws.schild:jave-nativebin-linux-arm64:3.1.1"
         //implementation "ws.schild:jave-nativebin-osx64:3.1.1"
 
         implementation "com.github.sealedtx:java-youtube-downloader:2.5.2"
