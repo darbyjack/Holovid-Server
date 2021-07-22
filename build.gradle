@@ -30,7 +30,7 @@ allprojects {
         testImplementation("junit:junit:4.13")
 
         implementation "org.springframework.boot:spring-boot-starter-web"
-        implementation "org.springframework.shell:spring-shell-starter:2.0.1.RELEASE"
+        //implementation "org.springframework.shell:spring-shell-starter:2.0.1.RELEASE"
         implementation "org.slf4j:slf4j-api"
         implementation "com.google.code.gson:gson:2.8.7"
 
