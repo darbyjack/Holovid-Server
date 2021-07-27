@@ -1,13 +1,10 @@
 # Prepare environment
-FROM adoptopenjdk/openjdk16:alpine-slim
+FROM openjdk:16
 
-# Build the source into a binary
-RUN chmod +x ./gradlew
-RUN ./gradlew clean build -x test
-
-# Copy to correct location
+# Setup the environment
+RUN mkdir -p /app
 COPY build/libs/HolovidServer-1.0-SNAPSHOT.jar /app
 WORKDIR /app
 
-# Package the application
-CMD java -Xms2G -Xmx2G -jar build/libs/HolovidServer-1.0-SNAPSHOT.jar
+# Start up the process
+CMD java -Xms2G -Xmx2G -jar /app/HolovidServer-1.0-SNAPSHOT.jar
